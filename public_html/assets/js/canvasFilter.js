@@ -23,16 +23,46 @@
 
         this.ctx = this.objects.canvas.getContext('2d');
         this.ctx.translate(-0.5, -0.5);
-
-
-
     };
-
+    canvasFilter.setFilterGrey = function(){
+        var c, imgData, i, max, r, g, b, grey;
+        c = canvasFilter.objects.canvas;        
+        var imgData = canvasFilter.getPixel(0, 0, c.width, c.height);
+        for (var i = 0, max = imgData.data.length; i < max; i += 4) {
+           r=imgData.data[i];
+           g=imgData.data[i + 1];
+           b=imgData.data[i + 2];
+           grey = (r + b + g) / 3;
+           r=imgData.data[i] = grey;
+           g=imgData.data[i + 1] = grey;
+           b=imgData.data[i + 2] = grey;
+        }
+        canvasFilter.setPixel(imgData, 0, 0);
+            
+    }
+    canvasFilter.setFilterLuminance = function(){
+        var c, imgData, i, max, r, g, b, luminance;
+        c = canvasFilter.objects.canvas;        
+        var imgData = canvasFilter.getPixel(0, 0, c.width, c.height);
+        for (var i = 0, max = imgData.data.length; i < max; i += 4) {
+           r=imgData.data[i];
+           g=imgData.data[i + 1];
+           b=imgData.data[i + 2];
+           luminance = 0.2125*r + 0.7151*g + 0.0722*b;
+           r=imgData.data[i] = luminance;
+           g=imgData.data[i + 1] = luminance;
+           b=imgData.data[i + 2] = luminance;
+        }
+        canvasFilter.setPixel(imgData, 0, 0);
+            
+    }
     canvasFilter.setImage = function (path, x, y) {
-        canvasFilter.image = new Image();
-        canvasFilter.image.src = path;       
-        canvasFilter.image.onload = function () {
-            canvasFilter.ctx.drawImage(canvasFilter.image, x, y);
+        var that = this;
+        this.image = new Image();
+        this.image.src = path;       
+        this.image.onload = function () {
+            //nun nicht mehr this, da nun nicht das image gemeint ist
+            that.ctx.drawImage(that.image, x, y);
         };
     };
 
@@ -46,7 +76,6 @@
         } else if (arguments.length < 6 || arguments.length !== 10) {
             return false;
         }
-
         var imgData = this.getPixel(x1, y1, w, h);  // x y w h 
         
 //        for (var i = 0, max = imgData.data.length; i < max; i += 4) {
@@ -65,7 +94,7 @@
         }
         this.setPixel(imgData, x2, y2); // y, x
     };
-
+    
     canvasFilter.getPixel = function (x, y, w, h) {
         return this.ctx.getImageData(x, y, w, h);
     };
