@@ -32,8 +32,8 @@
     helper.addEv('[name="blue"]', 'change', changeColor);
     helper.addEv('[name="alpha"]', 'change', changeColor);
     
-    helper.addEv('button[data-filter="grey"]', 'click', cf.setFilterGrey);
-    helper.addEv('button[data-filter="luminance"]', 'click', cf.setFilterLuminance);
+    helper.addEv('button[data-filter]', 'click', cf.setFilter);
+    
     ////                    r  g    b  a    x1 y1 w    h    x2  y2
 //    canvasFilter.setColor(0, 125, 0, 125, 0, 0);// Farbe + Transparenz 0-255
 //    canvasFilter.setColor(0, 125, 0, 125, 0, 0, 100, 100);// Farbe + Transparenz 0-255

@@ -25,41 +25,71 @@
         this.ctx.translate(-0.5, -0.5);
     };
     canvasFilter.setFilter = function(){
-        var c, imgData;
-        c = canvasFilter.objects.canvas;        
-        var imgData = canvasFilter.getPixel(0, 0, c.width, c.height);        
-        canvasFilter.setPixel(imgData, 0, 0);
-            
+        var c, imgData, type;
+        c = canvasFilter.objects.canvas;
+        imgData = canvasFilter.getPixel(0, 0, c.width, c.height);
+        type = this.getAttribute('data-filter');//holt den Wert des Attributes ['data-filter="grey"'] etc.
+        switch (type) {
+            case 'grey':
+                imgData = canvasFilter.setFilterGrey(imgData);
+                break;
+            case 'luminance':
+                imgData = canvasFilter.setFilterLuminance(imgData);
+                break;
+            case 'invert':
+                imgData = canvasFilter.setFilterInvert(imgData);
+                break;
+            case 'sepia':
+                imgData = canvasFilter.setFilterSepia(imgData);
+                break;
+            default:
+                return false;
+        }          
+        canvasFilter.setPixel(imgData, 0, 0);            
     };    
-    canvasFilter.setFilterGrey = function(imgData){
-        var i, max, r, g, b, grey;
-         for (var i = 0, max = imgData.data.length; i < max; i += 4) {
-           r=imgData.data[i];
-           g=imgData.data[i + 1];
-           b=imgData.data[i + 2];
-           grey = (r + b + g) / 3;
-           r=imgData.data[i] = grey;
-           g=imgData.data[i + 1] = grey;
-           b=imgData.data[i + 2] = grey;
-        }            
+    
+    canvasFilter.setFilterGrey = function(pix){
+        var i, max, grey;
+         for (i = 0, max = pix.data.length; i < max; i += 4) {
+           grey = (pix.data[i] + pix.data[i + 1] + pix.data[i + 2]) / 3;
+           pix.data[i] = grey;
+           pix.data[i + 1] = grey;
+           pix.data[i + 2] = grey;
+        }   
+        return pix;
     };
-    canvasFilter.setFilterLuminance = function(){
-        var c, imgData, i, max, r, g, b, luminance;
-        c = canvasFilter.objects.canvas;        
-        var imgData = canvasFilter.getPixel(0, 0, c.width, c.height);
-        for (var i = 0, max = imgData.data.length; i < max; i += 4) {
-           r=imgData.data[i];
-           g=imgData.data[i + 1];
-           b=imgData.data[i + 2];
-           
-           luminance = 0.2125*r + 0.7151*g + 0.0722*b;
-           
-           r=imgData.data[i] = luminance;
-           g=imgData.data[i + 1] = luminance;
-           b=imgData.data[i + 2] = luminance;
+    canvasFilter.setFilterLuminance = function(pix){
+        var i, max, luminance;
+        for (i = 0, max = pix.data.length; i < max; i += 4) {                     
+           luminance = 0.2125*pix.data[i] + 0.7151*pix.data[i + 1] + 0.0722*pix.data[i + 2];           
+           pix.data[i] = luminance;
+           pix.data[i + 1] = luminance;
+           pix.data[i + 2] = luminance;
         }
-        canvasFilter.setPixel(imgData, 0, 0);
-            
+        return pix;            
+    };
+    canvasFilter.setFilterInvert= function(arg){
+        var i, max;
+        for (i = 0, max = arg.data.length; i < max; i += 4) {          
+           arg.data[i] = 255 - arg.data[i];
+           arg.data[i + 1] = 255 - arg.data[i +1];
+           arg.data[i + 2] = 255 - arg.data[i +2];
+        }
+        return arg;            
+    };
+    canvasFilter.setFilterSepia= function(arg){
+        var i, max, r, g, b;
+        
+        
+        for (i = 0, max = arg.data.length; i < max; i += 4) {
+            r = arg.data[i];
+            g = arg.data[i + 1];
+            b = arg.data[i + 2];
+            arg.data[i] = r*0.393 + g*0.769 + b*0.188;
+            arg.data[i + 1] = r*0.349 + g*0.686 + b*0.168;
+            arg.data[i + 2] = r*0.272 + g*0.534 + b*0.131;
+        }
+        return arg;            
     };
     canvasFilter.setImage = function (path, x, y) {
         var that = this;
@@ -107,6 +137,5 @@
     canvasFilter.setPixel = function (imgData, x, y) {
         this.ctx.putImageData(imgData, x, y);
     };  
-
 })();
 
